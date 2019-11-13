@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/LTitan/BloomFilter/pkg/datastruct"
+	"github.com/LTitan/BloomFilter/internal/slave"
 )
-func main()  {
-	bit := datastruct.Bitmap{
-	}
+
+func main() {
+	slave.InitRouter()
 }

@@ -1,16 +1,19 @@
 package datastruct
 
 const (
+	// Size .
 	Size    uint = 64
 	logSize uint = 6
 )
 
+// Bitmap bit map
 type Bitmap struct {
 	element []uint64
 	length  uint
 }
 
-func New(length uint) (bmp *Bitmap) {
+// NewBitmap .
+func NewBitmap(length uint) (bmp *Bitmap) {
 	defer func() {
 		if r := recover(); r != nil {
 			bmp = &Bitmap{
@@ -27,6 +30,7 @@ func New(length uint) (bmp *Bitmap) {
 	return
 }
 
+// NeedSize .
 func NeedSize(n uint) int {
 	cap := ^uint(0)
 	if n > (cap - Size + 1) {
@@ -49,10 +53,14 @@ func (b *Bitmap) extend(n uint) {
 		b.length = n + 1
 	}
 }
+
+// Add .
 func (b *Bitmap) Add(n uint) {
 	b.extend(n)
 	b.element[n>>logSize] |= 1 << (n & (Size - 1))
 }
+
+// Has .
 func (b *Bitmap) Has(n uint) bool {
 	if n >= b.length {
 		return false
@@ -60,6 +68,7 @@ func (b *Bitmap) Has(n uint) bool {
 	return b.element[n>>logSize]&(1<<(n&(Size-1))) != 0
 }
 
-func (b *Bitmap)Len()uint{
+// Len .
+func (b *Bitmap) Len() uint {
 	return b.length
 }
