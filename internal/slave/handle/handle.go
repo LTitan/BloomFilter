@@ -1,10 +1,14 @@
 package handle
 
 import (
-	"github.com/koding/kite"
+	"github.com/LTitan/BloomFilter/pkg/response"
+	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
-// HelloWorld this is a hello world test
-func HelloWorld(req *kite.Request) (interface{}, error) {
-	return "hello world", nil
+// HelloWorld test
+func HelloWorld(c *gin.Context) {
+	app := response.APP{C: c}
+	app.Response(http.StatusOK, 20000, "ok", nil)
+	return
 }

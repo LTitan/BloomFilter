@@ -2,18 +2,12 @@ package slave
 
 import (
 	"github.com/LTitan/BloomFilter/internal/slave/handle"
-	"github.com/koding/kite"
+	"github.com/gin-gonic/gin"
 )
 
-var k *kite.Kite
-
-func init() {
-	k = kite.New("slave", "1.0.0")
-}
-
-// InitRouter init slave router
+// InitRouter init routers
 func InitRouter() {
-	k.Config.Port = 65220
-	k.HandleFunc("hello", handle.HelloWorld)
-	k.Run()
+	router := gin.Default()
+	router.GET("/", handle.HelloWorld)
+	router.Run(":65220")
 }
