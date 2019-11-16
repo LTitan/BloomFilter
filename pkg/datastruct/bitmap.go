@@ -1,5 +1,7 @@
 package datastruct
 
+import "sync"
+
 const (
 	// Size .
 	Size    uint = 64
@@ -10,6 +12,7 @@ const (
 type Bitmap struct {
 	element []uint64
 	length  uint
+	rw      *sync.RWMutex
 }
 
 // NewBitmap .
@@ -19,13 +22,14 @@ func NewBitmap(length uint) (bmp *Bitmap) {
 			bmp = &Bitmap{
 				make([]uint64, 0),
 				0,
+				&sync.RWMutex{},
 			}
 		}
 	}()
-
 	bmp = &Bitmap{
-		make([]uint64, NeedSize(length)),
-		length,
+		element: make([]uint64, length),
+		length:  length,
+		rw:      &sync.RWMutex{},
 	}
 	return
 }
@@ -56,8 +60,10 @@ func (b *Bitmap) extend(n uint) {
 
 // Add .
 func (b *Bitmap) Add(n uint) {
+	b.rw.Lock()
 	b.extend(n)
 	b.element[n>>logSize] |= 1 << (n & (Size - 1))
+	b.rw.Unlock()
 }
 
 // Has .
@@ -65,10 +71,40 @@ func (b *Bitmap) Has(n uint) bool {
 	if n >= b.length {
 		return false
 	}
-	return b.element[n>>logSize]&(1<<(n&(Size-1))) != 0
+	b.rw.RLock()
+	res := b.element[n>>logSize]&(1<<(n&(Size-1))) != 0
+	b.rw.RUnlock()
+	return res
 }
 
 // Len .
 func (b *Bitmap) Len() uint {
 	return b.length
 }
+
+// Clear clear
+func (b *Bitmap) Clear(i uint) {
+	if i >= b.length {
+		return
+	}
+	b.rw.Lock()
+	b.element[i>>logSize] &^= 1 << (i & (Size - 1))
+	b.rw.Unlock()
+	return
+}
+
+// Release .
+func (b *Bitmap) Release() {
+	b.element = nil
+	return
+}
+
+// func Int64ToBytes(i uint64) []byte {
+// 	var buf = make([]byte, 8)
+// 	binary.BigEndian.PutUint64(buf, i)
+// 	return buf
+// }
+
+// func BytesToInt64(buf []byte) uint64 {
+// 	return binary.BigEndian.Uint64(buf)
+// }
