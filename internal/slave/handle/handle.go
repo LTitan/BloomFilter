@@ -1,20 +1,19 @@
 package handle
 
 import (
+	"net/http"
+
 	appdata "github.com/LTitan/BloomFilter/pkg/app"
 	"github.com/LTitan/BloomFilter/pkg/datastruct"
 	"github.com/LTitan/BloomFilter/pkg/response"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"strconv"
-	"sync/atomic"
+	uuid "github.com/satori/go.uuid"
 )
 
 var cc colorController
 
 func init() {
-	cc.cnt = 1
-	cc.address = make(map[uint32]*datastruct.BloomFilter, 0)
+	cc.address = make(map[string]*datastruct.BloomFilter, 0)
 }
 
 // HelloWorld test
@@ -27,7 +26,6 @@ func HelloWorld(c *gin.Context) {
 // ApplyMemory .
 func ApplyMemory(c *gin.Context) {
 	app := response.APP{C: c}
-	var key uint32
 	var err error
 	var req appdata.ApplyRequest
 	if err = c.BindJSON(&req); err != nil {
@@ -38,10 +36,9 @@ func ApplyMemory(c *gin.Context) {
 		app.Response(http.StatusBadGateway, 50000, err.Error(), nil)
 		return
 	}
-	key = cc.cnt
-	atomic.AddUint32(&cc.cnt, 1)
-	cc.address[key] = datastruct.New(uint(req.Size * 1048576))
-	app.Response(http.StatusOK, 20000, "ok", map[string]interface{}{"key": key})
+	key := uuid.Must(uuid.NewV4(), nil)
+	cc.address[key.String()] = datastruct.New(uint(req.Size * 1048576))
+	app.Response(http.StatusOK, 20000, "ok", map[string]interface{}{"key": key.String()})
 	return
 }
 
@@ -66,20 +63,14 @@ func AddHandle(c *gin.Context) {
 // QueryValue .
 func QueryValue(c *gin.Context) {
 	key := c.Query("key")
-	k, err := strconv.Atoi(key)
 	app := response.APP{C: c}
-	if err != nil {
-		app.Response(http.StatusBadRequest, 40000, err.Error(), nil)
-		return
-	}
 	value := c.Query("value")
-	kk := uint32(k)
-	if cc.address[kk] == nil {
+	if cc.address[key] == nil {
 		app.Response(http.StatusOK, 20000, "ok", nil)
 		return
 	}
 	app.Response(http.StatusOK, 20000, "ok", map[string]interface{}{
-		"has": cc.address[kk].Has(value),
+		"has": cc.address[key].Has(value),
 	})
 	return
 }
@@ -88,18 +79,12 @@ func QueryValue(c *gin.Context) {
 func DeleteValue(c *gin.Context) {
 	value := c.Param("value")
 	key := c.Param("key")
-	k, err := strconv.Atoi(key)
 	app := response.APP{C: c}
-	if err != nil {
-		app.Response(http.StatusBadRequest, 40000, err.Error(), nil)
-		return
-	}
-	kk := uint32(k)
-	if cc.address[kk] == nil {
+	if cc.address[key] == nil {
 		app.Response(http.StatusOK, 20000, "no more", nil)
 		return
 	}
-	cc.address[kk].Delete(value)
+	cc.address[key].Delete(value)
 	app.Response(http.StatusOK, 20000, "success", map[string]interface{}{"value": value})
 	return
 }
@@ -107,18 +92,13 @@ func DeleteValue(c *gin.Context) {
 // DeleteKey .
 func DeleteKey(c *gin.Context) {
 	key := c.Param("key")
-	k, err := strconv.Atoi(key)
 	app := response.APP{C: c}
-	if err != nil {
-		app.Response(http.StatusBadRequest, 40000, err.Error(), nil)
-		return
-	}
-	kk := uint32(k)
-	if cc.address[kk] == nil {
+	if cc.address[key] == nil {
 		app.Response(http.StatusOK, 20000, "no more", nil)
 		return
 	}
-	cc.address[kk].Release()
+	cc.address[key].Release()
+	cc.address[key] = nil
 	app.Response(http.StatusOK, 20000, "success", map[string]interface{}{"key": key})
 	return
 }

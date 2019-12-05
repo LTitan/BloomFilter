@@ -8,8 +8,7 @@ import (
 )
 
 type colorController struct {
-	cnt     uint32
-	address map[uint32]*datastruct.BloomFilter
+	address map[string]*datastruct.BloomFilter
 }
 
 func addValues(req *appdata.AddRequest) {

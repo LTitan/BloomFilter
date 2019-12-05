@@ -18,7 +18,7 @@ require (
 	github.com/koding/logging v0.0.0-20160720134017-8b5a689ed69b // indirect
 	github.com/mackerelio/go-osstat v0.0.0-20191011055430-af968620273d
 	github.com/mattn/go-isatty v0.0.10 // indirect
-	github.com/satori/go.uuid v1.2.0 // indirect
+	github.com/satori/go.uuid v1.2.0
 	github.com/ugorji/go v1.1.7 // indirect
 	golang.org/x/crypto v0.0.0-20191117063200-497ca9f6d64f // indirect
 	golang.org/x/net v0.0.0-20191116160921-f9c825593386 // indirect

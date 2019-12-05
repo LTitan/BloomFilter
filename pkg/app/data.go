@@ -3,7 +3,7 @@ package app
 type (
 	// AddRequest .
 	AddRequest struct {
-		Key     uint32   `json:"key"`
+		Key     string   `json:"key"`
 		Strings []string `json:"strings"`
 	}
 	// ApplyRequest .

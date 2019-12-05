@@ -16,6 +16,7 @@ const (
 
 // RunClient .
 func RunClient() {
+	preCPU, _ := cpu.Get()
 	tm := time.NewTicker(time.Minute * 3)
 	for {
 		select {
@@ -25,14 +26,17 @@ func RunClient() {
 				panic(err)
 			}
 			c := rpc.NewGreeterClient(conn)
-			cpuInfo, _ := cpu.Get()
+			currCPU, _ := cpu.Get()
 			memoryInfo, _ := memory.Get()
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 			_, _ = c.HeartBeat(ctx, &rpc.MachineInfo{
-				Cpu:    int32(cpuInfo.Total),
-				Memory: int32(memoryInfo.Total),
+				Cpu:         int32(currCPU.CPUCount),
+				Memory:      int32(memoryInfo.Total / 1048576),
+				CpuUsage:    float32(currCPU.System-preCPU.System) / float32(currCPU.Total-preCPU.Total) * 100,
+				MemoryUsage: float32(memoryInfo.Used/memoryInfo.Total) * 100,
 			})
 			cancel()
+			preCPU = currCPU
 		}
 	}
 }

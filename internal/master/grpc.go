@@ -14,6 +14,7 @@ type server struct{}
 
 func (s *server) HeartBeat(ctx context.Context, req *rpc.MachineInfo) (*rpc.Reply, error) {
 	fmt.Printf("cpu:%v,memory:%v\n", req.GetCpu(), req.GetMemory())
+	fmt.Printf("curr cpu used: %.2f%%, memory used:%.2f%%\n", req.GetCpuUsage(), req.GetMemoryUsage())
 	return &rpc.Reply{Recv: true}, nil
 }
 
