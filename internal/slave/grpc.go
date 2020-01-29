@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	address = "10.2.214.61:50051"
+	address = "127.0.0.1:50051"
+	memBase = 1048576
 )
 
 // RunClient .
@@ -30,10 +31,10 @@ func RunClient() {
 			memoryInfo, _ := memory.Get()
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 			_, _ = c.HeartBeat(ctx, &rpc.MachineInfo{
-				Cpu:         int32(currCPU.CPUCount),
-				Memory:      int32(memoryInfo.Total / 1048576),
+				Cpu:         uint32(currCPU.CPUCount),
+				Memory:      memoryInfo.Total / 1048576,
 				CpuUsage:    float32(currCPU.System-preCPU.System) / float32(currCPU.Total-preCPU.Total) * 100,
-				MemoryUsage: float32(memoryInfo.Used/memoryInfo.Total) * 100,
+				MemoryUsage: float32((memoryInfo.Used/1048576)) / float32((memoryInfo.Total/1048576)) * 100,
 			})
 			cancel()
 			preCPU = currCPU
