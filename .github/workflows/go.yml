@@ -25,4 +25,4 @@ jobs:
         fi
 
     - name: Build
-      run: cd cmd/slave;go build -v .
+      run: cd cmd/router;go build -v .
