@@ -1,12 +1,19 @@
 package datastruct
 
-import "math"
+import (
+	"fmt"
+	"log"
+	"math"
+	"strconv"
+	"strings"
+	"unsafe"
 
-import "unsafe"
-
-import "fmt"
+	"github.com/LTitan/BloomFilter/pkg/files"
+)
 
 var seeds = []uint{13, 31, 131, 1313, 13131}
+
+const basePath = ".dump_record"
 
 // SimpleHash hash
 type SimpleHash struct {
@@ -83,4 +90,53 @@ func (bf *BloomFilter) Release() {
 	bf.Set.Release()
 	bf.Set = nil
 	return
+}
+
+// Dump .
+func (bf *BloomFilter) Dump(key string) {
+	str := bf.Set.String()
+	if err := fileop.CreateFileDir(basePath); err != nil {
+		log.Fatalln(err)
+		return
+	}
+	if err := fileop.WtiteString(basePath+"/"+key, str); err != nil {
+		log.Fatalln(err)
+		return
+	}
+}
+
+// Load return map[string]*filter
+func Load() (ret map[string]*BloomFilter, err error) {
+	files, err := fileop.GetAllFile(basePath)
+	if err != nil {
+		return nil, err
+	}
+	if len(files) <= 0 {
+		return nil, nil
+	}
+	ret = make(map[string]*BloomFilter, len(files))
+	for _, f := range files {
+		data, err := fileop.ReadFile(basePath, f)
+		if err != nil {
+			return nil, err
+		}
+		ret[f] = stringToBloomfilter(data)
+	}
+	return
+}
+
+func stringToBloomfilter(str string) *BloomFilter {
+	ret := New(0x01 << 20)
+	if len(str) == 0 {
+		return ret
+	}
+	nums := strings.Split(str, ",")
+	for _, num := range nums {
+		n, err := strconv.ParseUint(num, 10, 64)
+		if err != nil {
+			continue
+		}
+		ret.Set.Add(uint(n))
+	}
+	return ret
 }

@@ -99,6 +99,23 @@ func DeleteKey(c *gin.Context) {
 	}
 	cc.address[key].Release()
 	cc.address[key] = nil
+	delete(cc.address, key)
 	app.Response(http.StatusOK, 20000, "success", map[string]interface{}{"key": key})
+	return
+}
+
+// Dump2File .
+func Dump2File(c *gin.Context){
+	app := response.APP{C: c}
+	dumpToFile()
+	app.Response(http.StatusOK, 20000, "ok", nil)
+	return
+}
+
+// LoadFromFile .
+func LoadFromFile(c *gin.Context){
+	app := response.APP{C: c}
+	loadFromFile()
+	app.Response(http.StatusOK, 20000, "ok", nil)
 	return
 }

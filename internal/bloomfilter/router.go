@@ -16,6 +16,8 @@ func InitRouter() {
 		r.GET("/query", handle.QueryValue)
 		r.DELETE("/delete/:key/:value", handle.DeleteValue)
 		r.DELETE("/delete/:key", handle.DeleteKey)
+		r.POST("/dump", handle.Dump2File)
+		r.POST("/load", handle.LoadFromFile)
 	}
 	router.Run(":65220")
 }
