@@ -1,6 +1,10 @@
 package datastruct
 
-import "sync"
+import (
+	"sync"
+	"bytes"
+	"strconv"
+)
 
 const (
 	// Size .
@@ -108,3 +112,58 @@ func (b *Bitmap) Release() {
 // func BytesToInt64(buf []byte) uint64 {
 // 	return binary.BigEndian.Uint64(buf)
 // }
+
+// String .
+func (b *Bitmap) String() string {
+	var buffer bytes.Buffer
+	start := []byte{}
+	buffer.Write(start)
+	counter := 0
+	i, e := b.NextSet(0)
+	for e {
+		counter = counter + 1
+		if counter > 0x40000 {
+			buffer.WriteString("...")
+			break
+		}
+		buffer.WriteString(strconv.FormatInt(int64(i), 10))
+		i, e = b.NextSet(i + 1)
+		if e {
+			buffer.WriteString(",")
+		}
+	}
+	return buffer.String()
+}
+
+// NextSet .
+func (b *Bitmap) NextSet(i uint) (uint, bool) {
+	x := int(i >> logSize)
+	if x >= len(b.element) {
+		return 0, false
+	}
+	w := b.element[x]
+	w = w >> (i & (Size - 1))
+	if w != 0 {
+		return i + trailingZeroes64(w), true
+	}
+	x = x + 1
+	for x < len(b.element) {
+		if b.element[x] != 0 {
+			return uint(x)*Size + trailingZeroes64(b.element[x]), true
+		}
+		x = x + 1
+
+	}
+	return 0, false
+}
+
+var deBruijn = [...]byte{
+	0, 1, 56, 2, 57, 49, 28, 3, 61, 58, 42, 50, 38, 29, 17, 4,
+	62, 47, 59, 36, 45, 43, 51, 22, 53, 39, 33, 30, 24, 18, 12, 5,
+	63, 55, 48, 27, 60, 41, 37, 16, 46, 35, 44, 21, 52, 32, 23, 11,
+	54, 26, 40, 15, 34, 20, 31, 10, 25, 14, 19, 9, 13, 8, 7, 6,
+}
+
+func trailingZeroes64(v uint64) uint {
+	return uint(deBruijn[((v&-v)*0x03f79d71b4ca8b09)>>58])
+}
