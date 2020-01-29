@@ -1,7 +1,7 @@
-package slave
+package bloomfilter
 
 import (
-	"github.com/LTitan/BloomFilter/internal/slave/handle"
+	"github.com/LTitan/BloomFilter/internal/bloomfilter/handle"
 	"github.com/gin-gonic/gin"
 )
 

@@ -3,19 +3,19 @@
 OUTPUT_ROOT := output
 MKDIR_P = mkdir -p
 RM = rm -rf
-SLAVE = slave
-MASTER = master
+BLOOMFLITER = bloomfilter
+ROUTER = router
 
-slave:
-	@echo "build slave ....."
-	${MKDIR_P} ${OUTPUT_ROOT}/${SLAVE}
-	cd cmd/${SLAVE};go build -o ../../${OUTPUT_ROOT}/${SLAVE}/${SLAVE} -v .
+bf:
+	@echo "build bloomfilter binary ....."
+	${MKDIR_P} ${OUTPUT_ROOT}/${BLOOMFLITER}
+	cd cmd/${BLOOMFLITER};go build -o ../../${OUTPUT_ROOT}/${BLOOMFLITER}/${BLOOMFLITER} -v .
 	@echo "build finish"
 
-master:
-	@echo "build master ....."
-	${MKDIR_P} ${OUTPUT_ROOT}/${MASTER}
-	cd cmd/${MASTER};go build -o ../../${OUTPUT_ROOT}/${MASTER}/${MASTER} -v .
+router:
+	@echo "build router binary ....."
+	${MKDIR_P} ${OUTPUT_ROOT}/${ROUTER}
+	cd cmd/${ROUTER};go build -o ../../${OUTPUT_ROOT}/${ROUTER}/${ROUTER} -v .
 	@echo "build finish"
 
 clean:

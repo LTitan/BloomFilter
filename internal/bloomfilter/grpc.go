@@ -1,4 +1,4 @@
-package slave
+package bloomfilter
 
 import (
 	"context"
