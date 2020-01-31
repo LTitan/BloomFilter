@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/LTitan/BloomFilter/pkg/nets"
 	"github.com/LTitan/BloomFilter/pkg/rpc"
 	"github.com/mackerelio/go-osstat/cpu"
 	"github.com/mackerelio/go-osstat/memory"
@@ -30,12 +31,14 @@ func RunClient() {
 			}
 			c := rpc.NewGreeterClient(conn)
 			memoryInfo, _ := memory.Get()
+			ip := getLocalHost()
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 			_, _ = c.HeartBeat(ctx, &rpc.MachineInfo{
 				Cpu:         uint32(preCPU.CPUCount),
 				Memory:      memoryInfo.Total / memBase,
 				CpuUsage:    sumCPUUsage / cnt,
 				MemoryUsage: float32((memoryInfo.Used / memBase)) / float32((memoryInfo.Total / memBase)) * 100,
+				Host: ip,
 			})
 			cancel()
 			cnt = 0
@@ -47,4 +50,15 @@ func RunClient() {
 			cnt++
 		}
 	}
+}
+
+func getLocalHost() string {
+	ips, err := nets.GetIPv4ByInterface("eth2")
+	if err != nil {
+		return "unkonwn"
+	}
+	if len(ips) == 0 {
+		return "unkonwn"
+	}
+	return ips[0]
 }
