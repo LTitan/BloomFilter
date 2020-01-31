@@ -3,6 +3,7 @@
 OUTPUT_ROOT := output
 MKDIR_P = mkdir -p
 RM = rm -rf
+CP = cp -r
 BLOOMFLITER = bloomfilter
 ROUTER = router
 
@@ -17,6 +18,7 @@ router:
 	${MKDIR_P} ${OUTPUT_ROOT}/${ROUTER}
 	cd cmd/${ROUTER};go build -o ../../${OUTPUT_ROOT}/${ROUTER}/${ROUTER} -v .
 	@echo "build finish"
+	${CP} config ${OUTPUT_ROOT}/${ROUTER}
 
 clean:
 	${RM} ${OUTPUT_ROOT}

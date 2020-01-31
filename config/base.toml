@@ -1,4 +1,13 @@
-title = "bloom filter"
+title = "bloom filter config"
 
-[base]
-[base.config]
+[db]
+host = "127.0.0.1"
+port = 3306
+user = "lyf"
+password = "lyf110110"
+database = "bloomfilter"
+
+
+[dump]
+path = "./dump_record"
+

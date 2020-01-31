@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/LTitan/BloomFilter/internal/router/dao"
+	"github.com/LTitan/BloomFilter/internal/router/sqldata"
 	"github.com/LTitan/BloomFilter/pkg/rpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -13,8 +15,16 @@ import (
 type server struct{}
 
 func (s *server) HeartBeat(ctx context.Context, req *rpc.MachineInfo) (*rpc.Reply, error) {
-	fmt.Printf("cpu:%v,memory:%v\n", req.GetCpu(), req.GetMemory())
-	fmt.Printf("curr cpu used: %.2f%%, memory used:%.2f%%\n", req.GetCpuUsage(), req.GetMemoryUsage())
+	var record sqldata.HostHealthy
+	record.HostIP = req.GetHost()
+	record.CPUNum = int(req.GetCpu())
+	record.MemCap = int(req.GetMemory())
+	record.MemUsage = req.GetMemoryUsage()
+	record.CPUUsage = req.GetCpuUsage()
+	fmt.Printf("from host: %s\n", record.HostIP)
+	fmt.Printf("cpu num: %v,memory cap:%v\n", record.CPUNum, record.MemCap)
+	fmt.Printf("curr cpu used: %.2f%%, memory used:%.2f%%\n", record.CPUUsage, record.MemUsage)
+	_ = dao.CreatedOneRecord(&record)
 	return &rpc.Reply{Recv: true}, nil
 }
 

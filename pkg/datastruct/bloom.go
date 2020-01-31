@@ -13,7 +13,7 @@ import (
 
 var seeds = []uint{13, 31, 131, 1313, 13131}
 
-const basePath = ".dump_record"
+const basePath = "./dump_record"
 
 // SimpleHash hash
 type SimpleHash struct {
