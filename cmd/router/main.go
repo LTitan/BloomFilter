@@ -2,8 +2,10 @@ package main
 
 import (
 	"github.com/LTitan/BloomFilter/internal/router"
+	"github.com/LTitan/BloomFilter/internal/router/gateway"
 )
 
 func main() {
-	router.RunServer()
+	go router.RunServer()
+	gateway.InitRouter()
 }
