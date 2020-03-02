@@ -2,8 +2,10 @@ package bloomfilter
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/LTitan/BloomFilter/pkg/config"
 	"github.com/LTitan/BloomFilter/pkg/nets"
 	"github.com/LTitan/BloomFilter/pkg/rpc"
 	"github.com/mackerelio/go-osstat/cpu"
@@ -11,16 +13,28 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	address = "127.0.0.1:50051"
-	memBase = 1048576
+var (
+	address, network string
 )
+
+const (
+	memBase       = 1048576
+	cpuTickerTime = time.Second * 5
+	heartBeatTime = time.Minute * 3
+)
+
+func init() {
+	host := config.Conf.Get("router.host")
+	port := config.Conf.Get("router.grpc_port")
+	address = fmt.Sprintf("%v:%v", host, port)
+	network = config.Conf.Get("bloomfilter.network").(string)
+}
 
 // RunClient .
 func RunClient() {
 	preCPU, _ := cpu.Get()
-	tm := time.NewTicker(time.Minute * 3)
-	cpuTicker := time.NewTicker(time.Second * 5)
+	tm := time.NewTicker(heartBeatTime)
+	cpuTicker := time.NewTicker(cpuTickerTime)
 	var sumCPUUsage, cnt float32
 	for {
 		select {
@@ -38,7 +52,7 @@ func RunClient() {
 				Memory:      memoryInfo.Total / memBase,
 				CpuUsage:    sumCPUUsage / cnt,
 				MemoryUsage: float32((memoryInfo.Used / memBase)) / float32((memoryInfo.Total / memBase)) * 100,
-				Host: ip,
+				Host:        ip,
 			})
 			cancel()
 			cnt = 0
@@ -53,7 +67,7 @@ func RunClient() {
 }
 
 func getLocalHost() string {
-	ips, err := nets.GetIPv4ByInterface("eth2")
+	ips, err := nets.GetIPv4ByInterface(network)
 	if err != nil {
 		return "unkonwn"
 	}

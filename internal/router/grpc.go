@@ -7,10 +7,17 @@ import (
 
 	"github.com/LTitan/BloomFilter/internal/router/dao"
 	"github.com/LTitan/BloomFilter/internal/router/sqldata"
+	"github.com/LTitan/BloomFilter/pkg/config"
 	"github.com/LTitan/BloomFilter/pkg/rpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
+
+var port string
+
+func init() {
+	port = fmt.Sprintf(":%v", config.Conf.Get("router.grpc_port"))
+}
 
 type server struct{}
 
@@ -30,7 +37,7 @@ func (s *server) HeartBeat(ctx context.Context, req *rpc.MachineInfo) (*rpc.Repl
 
 // RunServer .
 func RunServer() {
-	lis, err := net.Listen("tcp", ":50051")
+	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		panic("failed to listen:" + err.Error())
 	}

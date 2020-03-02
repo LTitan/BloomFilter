@@ -6,7 +6,7 @@ import (
 )
 
 // InitRouter init routers
-func InitRouter() {
+func InitRouter(port string) {
 	router := gin.Default()
 	router.GET("/", handle.HelloWorld)
 	r := router.Group("/api/v1")
@@ -19,5 +19,5 @@ func InitRouter() {
 		r.POST("/dump", handle.Dump2File)
 		r.POST("/load", handle.LoadFromFile)
 	}
-	router.Run(":65220")
+	router.Run(port)
 }

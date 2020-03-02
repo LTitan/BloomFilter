@@ -11,6 +11,7 @@ bf:
 	@echo "build bloomfilter binary ....."
 	${MKDIR_P} ${OUTPUT_ROOT}/${BLOOMFLITER}
 	cd cmd/${BLOOMFLITER};go build -o ../../${OUTPUT_ROOT}/${BLOOMFLITER}/${BLOOMFLITER} -v .
+	${CP} config ${OUTPUT_ROOT}/${BLOOMFLITER}
 	@echo "build finish"
 
 router:
