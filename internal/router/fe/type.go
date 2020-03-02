@@ -10,4 +10,5 @@ type (
 			Memory []int `json:"memory"`
 		}`json:"series"`
 	}
+
 )

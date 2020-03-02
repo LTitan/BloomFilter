@@ -16,6 +16,11 @@ func readConfigFile(fileName string) (config []byte, err error) {
 var Conf *viper.Viper
 
 func init() {
+	Reload()
+}
+
+// Reload reload conifg
+func Reload() {
 	Conf = viper.New()
 	Conf.SetConfigType("toml")
 	config, err := readConfigFile("./config/base.toml")

@@ -11,3 +11,12 @@ database = "bloomfilter"
 [dump]
 path = "./dump_record"
 
+[router]
+host = "192.168.1.106"
+server_port = "65221"
+grpc_port = "50051"
+
+
+[bloomfilter]
+port = "65220"
+network = "eth2"

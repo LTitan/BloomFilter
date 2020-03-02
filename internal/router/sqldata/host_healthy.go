@@ -14,9 +14,21 @@ type (
 		CPUUsage float32
 		MemUsage float32
 	}
+	// UserInfo .
+	UserInfo struct {
+		*gorm.Model
+		Name     string `json:"name"`
+		Password string `json:"password"`
+		ImageSrc string `json:"img_src" gorm:"column:img_src"`
+	}
 )
 
 // TableName .
-func (h *HostHealthy)TableName()(string){
+func (h *HostHealthy) TableName() string {
 	return "host_healthy"
+}
+
+// TableName .
+func (u *UserInfo) TableName() string {
+	return "users"
 }
