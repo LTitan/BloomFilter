@@ -79,3 +79,14 @@ func (q *PriorityQueue) Remove(i int) Interface {
 func (q *PriorityQueue) Len() int {
 	return q.s.Len()
 }
+
+// GetSource .
+func (q *PriorityQueue) GetSource() (ret []Interface) {
+	if q.s != nil {
+		for i := range *q.s {
+			ret = append(ret, (*q.s)[i])
+		}
+		return
+	}
+	return nil
+}
