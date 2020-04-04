@@ -27,7 +27,7 @@ func GetHosts() []string {
 func Register(uuid string, address string) {
 	uuidMap.Store(uuid, address)
 }
-func GetRegistedHost(uuid string) (string, bool) {
+func GetRegistedHost(uuid string) (interface{}, bool) {
 	return uuidMap.Load(uuid)
 }
 func DelRegisterHost(uuid string) {
