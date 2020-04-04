@@ -12,7 +12,7 @@ func main() {
 	if port == ":" {
 		panic("slave port is null")
 	}
-	go bloomfilter.RunClient()
-
-	bloomfilter.InitRouter(port)
+	serve := config.Conf.Get("bloomfilter.port").(int64)
+	go bloomfilter.RunClient(uint32(serve))
+	bloomfilter.RunServer(port)
 }

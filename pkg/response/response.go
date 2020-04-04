@@ -21,3 +21,17 @@ func (a *APP) Response(responseCode, internalCode int, msg string, data interfac
 	)
 	return
 }
+
+// ResponseWithPage .
+func (a *APP) ResponseWithPage(responseCode, internalCode int, msg string, data interface{}, page interface{}) {
+	a.C.JSON(
+		responseCode,
+		gin.H{
+			"code":    internalCode,
+			"message": msg,
+			"data":    data,
+			"page":    page,
+		},
+	)
+	return
+}

@@ -1,3 +1,5 @@
+// Package bloomfilter internal package to achive CRUD handler
+// this file to run heartbeat
 package bloomfilter
 
 import (
@@ -6,6 +8,7 @@ import (
 	"time"
 
 	"github.com/LTitan/BloomFilter/pkg/config"
+	"github.com/LTitan/BloomFilter/pkg/logs"
 	"github.com/LTitan/BloomFilter/pkg/nets"
 	"github.com/LTitan/BloomFilter/pkg/rpc"
 	"github.com/mackerelio/go-osstat/cpu"
@@ -31,7 +34,7 @@ func init() {
 }
 
 // RunClient .
-func RunClient() {
+func RunClient(server uint32) {
 	preCPU, _ := cpu.Get()
 	tm := time.NewTicker(heartBeatTime)
 	cpuTicker := time.NewTicker(cpuTickerTime)
@@ -47,13 +50,17 @@ func RunClient() {
 			memoryInfo, _ := memory.Get()
 			ip := getLocalHost()
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
-			_, _ = c.HeartBeat(ctx, &rpc.MachineInfo{
+			_, err = c.HeartBeat(ctx, &rpc.MachineInfo{
 				Cpu:         uint32(preCPU.CPUCount),
 				Memory:      memoryInfo.Total / memBase,
 				CpuUsage:    sumCPUUsage / cnt,
 				MemoryUsage: float32((memoryInfo.Used / memBase)) / float32((memoryInfo.Total / memBase)) * 100,
 				Host:        ip,
+				Port:        server,
 			})
+			if err != nil {
+				logs.Logger.Errorf("send heartbeat fail, reason: %v", err)
+			}
 			cancel()
 			cnt = 0
 			sumCPUUsage = 0
