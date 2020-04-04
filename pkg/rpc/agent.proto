@@ -8,12 +8,55 @@ message MachineInfo {
     uint64 memory = 3;
     float memory_usage = 4;
     string host = 5;
+    uint32 port = 6;
 }
 
 message Reply{
-    bool recv = 1; 
+    bool recv = 1;
+}
+
+message ApplyReply{
+    bool recv = 1;
+    string key = 2;
+}
+
+
+message ApplyRequest {
+    uint64 size = 1;
+}
+
+message AddRequest {
+    string key = 1;
+    repeated string values = 2;
+}
+
+message DeleteRequest {
+    string key = 1;
+}
+
+message QueryRequest{
+    string key = 1;
+    string value = 2;
+}
+
+message QueryManyRequest{
+    string key = 1;
+    repeated string values = 2;
+}
+message QueryManyReply{
+    bool has = 1;
+    repeated bool result = 2;
+    string err = 3;
 }
 
 service Greeter{
     rpc HeartBeat(MachineInfo) returns(Reply){}
+}
+
+service SlaveServer{
+    rpc Apply(ApplyRequest) returns(ApplyReply){}
+    rpc Add(AddRequest) returns(Reply){}
+    rpc Delete(DeleteRequest) returns(Reply){}
+    rpc QuerySingle(QueryRequest) returns(Reply){}
+    rpc QueryAll(QueryManyRequest) returns(QueryManyReply){}
 }

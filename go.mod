@@ -18,15 +18,19 @@ require (
 	github.com/koding/logging v0.0.0-20160720134017-8b5a689ed69b // indirect
 	github.com/mackerelio/go-osstat v0.0.0-20191011055430-af968620273d
 	github.com/mattn/go-isatty v0.0.10 // indirect
+	github.com/natefinch/lumberjack v2.0.0+incompatible
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
+	github.com/spf13/cobra v0.0.6
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.6.2
 	github.com/ugorji/go v1.1.7 // indirect
+	go.uber.org/zap v1.14.1
 	golang.org/x/mod v0.2.0 // indirect
 	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
@@ -39,5 +43,6 @@ require (
 	google.golang.org/grpc v1.27.0
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )

@@ -6,8 +6,10 @@ import (
 	"net"
 
 	"github.com/LTitan/BloomFilter/internal/router/dao"
+	"github.com/LTitan/BloomFilter/internal/router/register"
 	"github.com/LTitan/BloomFilter/internal/router/sqldata"
 	"github.com/LTitan/BloomFilter/pkg/config"
+	"github.com/LTitan/BloomFilter/pkg/logs"
 	"github.com/LTitan/BloomFilter/pkg/rpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -28,9 +30,11 @@ func (s *server) HeartBeat(ctx context.Context, req *rpc.MachineInfo) (*rpc.Repl
 	record.MemCap = int(req.GetMemory())
 	record.MemUsage = req.GetMemoryUsage()
 	record.CPUUsage = req.GetCpuUsage()
-	fmt.Printf("from host: %s\n", record.HostIP)
-	fmt.Printf("cpu num: %v,memory cap:%v\n", record.CPUNum, record.MemCap)
-	fmt.Printf("curr cpu used: %.2f%%, memory used:%.2f%%\n", record.CPUUsage, record.MemUsage)
+	record.Port = req.GetPort()
+	logs.Logger.Infof("from host: %s:%d, cpu number:%d, memory size:%d, cpu used:%.2f%%, memory used:%.2f%%", record.HostIP, record.Port, record.CPUNum, record.MemCap, record.CPUUsage, record.MemUsage)
+	go func() {
+		register.SetHost(fmt.Sprintf("%v:%v", record.HostIP, record.Port))
+	}()
 	_ = dao.CreatedOneRecord(&record)
 	return &rpc.Reply{Recv: true}, nil
 }

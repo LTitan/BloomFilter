@@ -8,7 +8,7 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/LTitan/BloomFilter/pkg/files"
+	fileop "github.com/LTitan/BloomFilter/pkg/files"
 )
 
 var seeds = []uint{13, 31, 131, 1313, 13131}
@@ -41,7 +41,7 @@ type BloomFilter struct {
 func New(size uint) *BloomFilter {
 	bf := new(BloomFilter)
 	for i := 0; i < len(seeds); i++ {
-		sh := SimpleHash{Cap: 0x1f3fffff, Seed: seeds[i]}
+		sh := SimpleHash{Cap: 0x1111ffff, Seed: seeds[i]}
 		bf.Funcs = append(bf.Funcs, sh)
 	}
 	bf.Set = NewBitmap(size)

@@ -13,6 +13,7 @@ type (
 		MemCap   int
 		CPUUsage float32
 		MemUsage float32
+		Port     uint32
 	}
 	// UserInfo .
 	UserInfo struct {

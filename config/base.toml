@@ -18,5 +18,5 @@ grpc_port = "50051"
 
 
 [bloomfilter]
-port = "65220"
+port = 65220
 network = "eth2"

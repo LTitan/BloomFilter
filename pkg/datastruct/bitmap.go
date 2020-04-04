@@ -1,9 +1,9 @@
 package datastruct
 
 import (
-	"sync"
 	"bytes"
 	"strconv"
+	"sync"
 )
 
 const (
@@ -118,14 +118,10 @@ func (b *Bitmap) String() string {
 	var buffer bytes.Buffer
 	start := []byte{}
 	buffer.Write(start)
-	counter := 0
+	var counter uint64
 	i, e := b.NextSet(0)
 	for e {
-		counter = counter + 1
-		if counter > 0x40000 {
-			buffer.WriteString("...")
-			break
-		}
+		counter++
 		buffer.WriteString(strconv.FormatInt(int64(i), 10))
 		i, e = b.NextSet(i + 1)
 		if e {
