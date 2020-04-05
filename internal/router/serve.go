@@ -1,40 +1,34 @@
-package gateway
+package router
 
 import (
 	"fmt"
 	"net/http"
 	"strings"
 
+	_ "github.com/LTitan/BloomFilter/docs"
+	rh "github.com/LTitan/BloomFilter/internal/router/handler"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-
-	_ "github.com/LTitan/BloomFilter/docs"
 )
 
+var fe rh.FE
+var slave rh.Slave
+
 // InitRouter .
-// @Title Swagger Example API
-// @Version 1.0
-// @Description This is a sample server Petstore server.
-
-// @License.name Apache 2.0
-// @License.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @Host 127.0.0.1
-// @BasePath /api/v1
 func InitRouter(port string) {
 	router := gin.Default()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Use(Cors())
 	r := router.Group("/api/v1")
 	{
-		r.GET("/host/info", QueryCPUMemory)
-		r.POST("/user", CreateUser)
-		r.POST("/user/authorization", QueryHasUser)
-		r.POST("/bloomfilter/apply", ApplyMemory)
-		r.GET("/bloomfilter/query", QueryValue)
-		r.POST("/bloomfilter/query", QueryMany)
-		r.POST("/bloomfilter/add", AddValues)
+		r.GET("/host/info", fe.QueryCPUMemory)
+		r.POST("/user", fe.CreateUser)
+		r.POST("/user/authorization", fe.QueryHasUser)
+		r.POST("/bloomfilter/apply", slave.ApplyMemory)
+		r.GET("/bloomfilter/query", slave.QueryValue)
+		r.POST("/bloomfilter/query", slave.QueryMany)
+		r.POST("/bloomfilter/add", slave.AddValues)
 	}
 	router.Run(port)
 }

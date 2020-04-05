@@ -9,14 +9,26 @@ type APP struct {
 	C *gin.Context
 }
 
+const (
+	ParamsError = 4000
+	ServeError  = 5000
+	OK          = 2000
+)
+
+type ResponseCommon struct {
+	Code    int         `json:"int"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+}
+
 // Response to response
 func (a *APP) Response(responseCode, internalCode int, msg string, data interface{}) {
 	a.C.JSON(
 		responseCode,
-		gin.H{
-			"code":    internalCode,
-			"message": msg,
-			"data":    data,
+		ResponseCommon{
+			Code:    internalCode,
+			Message: msg,
+			Data:    data,
 		},
 	)
 	return

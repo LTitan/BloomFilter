@@ -1,0 +1,131 @@
+basePath: /api/v1
+definitions:
+  app.AddRequest:
+    properties:
+      key:
+        type: string
+      strings:
+        items:
+          type: string
+        type: array
+    type: object
+  app.ApplyRequest:
+    properties:
+      size:
+        type: integer
+    type: object
+  handler.ApplyRes:
+    properties:
+      key:
+        type: string
+      "yes":
+        type: boolean
+    type: object
+host: 127.0.0.1:65221
+info:
+  contact: {}
+  description: This is a sample server Petstore server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: bloomfilter router
+  version: "1.0"
+paths:
+  /bloomfilter/add:
+    post:
+      description: query single value
+      parameters:
+      - description: add values
+        in: body
+        name: values
+        required: true
+        schema:
+          $ref: '#/definitions/app.AddRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: bool
+        "400":
+          description: Bad Request
+          schema:
+            type: bool
+      tags:
+      - Slave
+  /bloomfilter/apply:
+    post:
+      consumes:
+      - application/json
+      description: apply bloomfilter memory
+      parameters:
+      - description: alloc size
+        in: body
+        name: allocSize
+        required: true
+        schema:
+          $ref: '#/definitions/app.ApplyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: code":2000,"data":null,"message":""}
+          schema:
+            $ref: '#/definitions/handler.ApplyRes'
+        "400":
+          description: code":4000,"data":null,"message":""}
+          schema:
+            $ref: '#/definitions/handler.ApplyRes'
+      tags:
+      - Slave
+  /bloomfilter/query:
+    get:
+      description: query single value
+      parameters:
+      - description: apply key
+        in: query
+        name: key
+        required: true
+        type: string
+      - description: query value
+        in: query
+        name: value
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: bool
+        "400":
+          description: Bad Request
+          schema:
+            type: bool
+      tags:
+      - Slave
+    post:
+      description: query single value
+      parameters:
+      - description: add values
+        in: body
+        name: values
+        required: true
+        schema:
+          $ref: '#/definitions/app.AddRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: bool
+        "400":
+          description: Bad Request
+          schema:
+            type: bool
+      tags:
+      - Slave
+swagger: "2.0"
