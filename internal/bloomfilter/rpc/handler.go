@@ -35,15 +35,17 @@ func (*Slave) Apply(ctx context.Context, ar *rpc.ApplyRequest) (*rpc.ApplyReply,
 
 func (*Slave) Add(ctx context.Context, ar *rpc.AddRequest) (*rpc.Reply, error) {
 	response := new(rpc.Reply)
-	if _, ok := cc.address[ar.GetKey()]; !ok {
+	key := ar.GetKey()
+	if _, ok := cc.address[key]; !ok {
 		logs.Logger.Warnf("not found uuid key is %v", ar.GetKey())
 		response.Recv = false
 		err := fmt.Errorf("not found uuid key")
 		return response, err
 	}
 	str := ar.GetValues()
+	logs.Logger.Infof("recv add strings are: %v", str)
 	for i := range str {
-		cc.address[ar.GetKey()].Add(str[i])
+		cc.address[key].Add(str[i])
 	}
 	response.Recv = true
 	return response, nil
@@ -72,7 +74,9 @@ func (*Slave) QuerySingle(ctx context.Context, rq *rpc.QueryRequest) (*rpc.Reply
 		err := fmt.Errorf("not found uuid key")
 		return response, err
 	}
-	response.Recv = cc.address[key].Has(rq.GetValue())
+	value := rq.GetValue()
+	logs.Logger.Infof("query single value key: %v, value : %v", key, value)
+	response.Recv = cc.address[key].Has(value)
 	return response, nil
 }
 
