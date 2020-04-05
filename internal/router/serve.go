@@ -1,22 +1,34 @@
-package gateway
+package router
 
 import (
 	"fmt"
 	"net/http"
 	"strings"
 
+	_ "github.com/LTitan/BloomFilter/docs"
+	rh "github.com/LTitan/BloomFilter/internal/router/handler"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+var fe rh.FE
+var slave rh.Slave
 
 // InitRouter .
 func InitRouter(port string) {
 	router := gin.Default()
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Use(Cors())
 	r := router.Group("/api/v1")
 	{
-		r.GET("/host/info", QueryCPUMemory)
-		r.POST("/user", CreateUser)
-		r.POST("/user/authorization", QueryHasUser)
+		r.GET("/host/info", fe.QueryCPUMemory)
+		r.POST("/user", fe.CreateUser)
+		r.POST("/user/authorization", fe.QueryHasUser)
+		r.POST("/bloomfilter/apply", slave.ApplyMemory)
+		r.GET("/bloomfilter/query", slave.QueryValue)
+		r.POST("/bloomfilter/query", slave.QueryMany)
+		r.POST("/bloomfilter/add", slave.AddValues)
 	}
 	router.Run(port)
 }

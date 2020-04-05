@@ -1,4 +1,4 @@
-package gateway
+package handler
 
 import (
 	"net/http"
@@ -9,8 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// FE .
+type FE struct{}
+
 // QueryCPUMemory .
-func QueryCPUMemory(ctx *gin.Context) {
+func (*FE) QueryCPUMemory(ctx *gin.Context) {
 	app := response.APP{C: ctx}
 	ret, err := dao.QueryHostHardwareInfo()
 	if err != nil {
@@ -22,14 +25,14 @@ func QueryCPUMemory(ctx *gin.Context) {
 }
 
 // CreateUser .
-func CreateUser(ctx *gin.Context){
+func (*FE) CreateUser(ctx *gin.Context) {
 	app := response.APP{C: ctx}
 	var user sqldata.UserInfo
-	if err := ctx.BindJSON(&user);err!=nil{
+	if err := ctx.BindJSON(&user); err != nil {
 		app.Response(http.StatusBadRequest, 40000, err.Error(), nil)
 		return
 	}
-	if err := dao.CreateUser(&user);err!=nil{
+	if err := dao.CreateUser(&user); err != nil {
 		app.Response(http.StatusBadGateway, 50000, err.Error(), nil)
 		return
 	}
@@ -38,15 +41,15 @@ func CreateUser(ctx *gin.Context){
 }
 
 // QueryHasUser .
-func QueryHasUser(ctx *gin.Context){
+func (*FE) QueryHasUser(ctx *gin.Context) {
 	app := response.APP{C: ctx}
 	var user sqldata.UserInfo
-	if err := ctx.BindJSON(&user);err!=nil{
+	if err := ctx.BindJSON(&user); err != nil {
 		app.Response(http.StatusBadRequest, 40000, err.Error(), nil)
 		return
 	}
 	ret, err := dao.QueryHasUser(&user)
-	if err != nil{
+	if err != nil {
 		app.Response(http.StatusBadGateway, 50000, err.Error(), nil)
 		return
 	}
