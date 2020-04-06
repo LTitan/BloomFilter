@@ -3,7 +3,9 @@
 package bloomfilter
 
 import (
+	"context"
 	"net"
+	"time"
 
 	self "github.com/LTitan/BloomFilter/internal/bloomfilter/rpc"
 	"github.com/LTitan/BloomFilter/pkg/logs"
@@ -14,10 +16,16 @@ import (
 )
 
 // RunServer .
-func RunServer(port string) {
+func RunServer(port string, _port uint32) {
 	go self.DumpTricker()
 	go signal.ExitBeautiful(func() {
-		logs.Logger.Warnf("process will exit ....")
+		conn, _ := grpc.Dial(address, grpc.WithInsecure())
+		c := rpc.NewGreeterClient(conn)
+		ip := getLocalHost()
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+		_, err := c.CancelRegister(ctx, &rpc.MachineInfo{Host: ip, Port: _port})
+		defer cancel()
+		logs.Logger.Warnf("process will exit ...., cancel register send error: %v", err)
 		defer logs.Logger.Sync()
 	})
 	lis, err := net.Listen("tcp", port)

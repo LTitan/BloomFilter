@@ -7,6 +7,9 @@ import (
 
 	_ "github.com/LTitan/BloomFilter/docs"
 	rh "github.com/LTitan/BloomFilter/internal/router/handler"
+	"github.com/LTitan/BloomFilter/pkg/logs"
+	"github.com/LTitan/BloomFilter/pkg/signal"
+	"github.com/LTitan/BloomFilter/pkg/sql"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -17,6 +20,10 @@ var slave rh.Slave
 
 // InitRouter .
 func InitRouter(port string) {
+	go signal.ExitBeautiful(func() {
+		err := sql.DefaultDB.Close()
+		logs.Logger.Warnf("db will close, error %v", err)
+	})
 	router := gin.Default()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Use(Cors())

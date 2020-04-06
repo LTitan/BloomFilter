@@ -23,6 +23,15 @@ func GetHosts() []string {
 	})
 	return res
 }
+func DelHost(address string) {
+	globalMap.Delete(address)
+	uuidMap.Range(func(k, v interface{}) bool {
+		if v.(string) == address {
+			uuidMap.Delete(k)
+		}
+		return true
+	})
+}
 
 func Register(uuid string, address string) {
 	uuidMap.Store(uuid, address)

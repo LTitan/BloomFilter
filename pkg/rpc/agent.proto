@@ -51,6 +51,7 @@ message QueryManyReply{
 
 service Greeter{
     rpc HeartBeat(MachineInfo) returns(Reply){}
+    rpc CancelRegister(MachineInfo) returns(Reply){}
 }
 
 service SlaveServer{
