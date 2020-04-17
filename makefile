@@ -6,6 +6,7 @@ RM = rm -rf
 CP = cp -r
 BLOOMFLITER = bloomfilter
 ROUTER = router
+PROXY = proxy
 
 bf:
 	@echo "build bloomfilter binary ....."
@@ -20,6 +21,13 @@ router:
 	cd cmd/${ROUTER};go build -o ../../${OUTPUT_ROOT}/${ROUTER}/${ROUTER} -v .
 	@echo "build finish"
 	${CP} config ${OUTPUT_ROOT}/${ROUTER}
+
+proxy:
+	@echo "build proxy binary ....."
+	${MKDIR_P} ${OUTPUT_ROOT}/${PROXY}
+	cd cmd/${PROXY};go build -o ../../${OUTPUT_ROOT}/${PROXY}/${PROXY} -v .
+	@echo "build proxy finish"
+	${CP} config ${OUTPUT_ROOT}/${PROXY}
 
 clean:
 	${RM} ${OUTPUT_ROOT}

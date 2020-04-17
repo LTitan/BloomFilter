@@ -66,6 +66,11 @@ var doc = `{
         },
         "/bloomfilter/apply": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "apply bloomfilter memory",
                 "consumes": [
                     "application/json"
@@ -98,6 +103,45 @@ var doc = `{
                         "description": "code\":4000,\"data\":null,\"message\":\"\"}",
                         "schema": {
                             "$ref": "#/definitions/handler.ApplyRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/bloomfilter/del/{uuid}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Slave"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "key(uuid)",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "boolean"
                         }
                     }
                 }
@@ -177,6 +221,45 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/bloomfilter/{address}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "backup address",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Slave"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "address(ip:port)",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -197,6 +280,9 @@ var doc = `{
         "app.ApplyRequest": {
             "type": "object",
             "properties": {
+                "expiration": {
+                    "type": "string"
+                },
                 "size": {
                     "type": "integer"
                 }
@@ -212,6 +298,13 @@ var doc = `{
                     "type": "boolean"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

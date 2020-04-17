@@ -48,6 +48,9 @@ message QueryManyReply{
     repeated bool result = 2;
     string err = 3;
 }
+message BackUpReply{
+    repeated  string keys = 1;
+}
 
 service Greeter{
     rpc HeartBeat(MachineInfo) returns(Reply){}
@@ -60,4 +63,5 @@ service SlaveServer{
     rpc Delete(DeleteRequest) returns(Reply){}
     rpc QuerySingle(QueryRequest) returns(Reply){}
     rpc QueryAll(QueryManyRequest) returns(QueryManyReply){}
+    rpc DoBackup(Reply) returns(BackUpReply){}
 }

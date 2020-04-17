@@ -30,12 +30,25 @@ func InitRouter(port string) {
 	r := router.Group("/api/v1")
 	{
 		r.GET("/host/info", fe.QueryCPUMemory)
+		r.GET("/host/pagination", fe.QueryApplyPagination)
+		r.POST("/host/applyinfo/update", fe.UpdateApplyRecord)
+		r.DELETE("/host/applyinfo", fe.DeleteApplyRecord)
+		r.GET("/host", fe.GetAliveHosts)
+		r.GET("/host/single", fe.GetSingleAddressInfo)
+		r.GET("/host/register", fe.RegisterDistribution)
+		r.GET("/host/register/memory", fe.GetRegisterMemoryInfo)
+
+		r.POST("/file/upload", upload)
+		r.GET("/file/upload", slave.ReadUploadFile)
+
 		r.POST("/user", fe.CreateUser)
 		r.POST("/user/authorization", fe.QueryHasUser)
 		r.POST("/bloomfilter/apply", slave.ApplyMemory)
 		r.GET("/bloomfilter/query", slave.QueryValue)
 		r.POST("/bloomfilter/query", slave.QueryMany)
 		r.POST("/bloomfilter/add", slave.AddValues)
+		r.DELETE("/bloomfilter/del/:uuid", slave.DeletKey)
+		r.PUT("/bloomfilter/:address", slave.BackupSlave)
 	}
 	router.Run(port)
 }
@@ -75,4 +88,22 @@ func Cors() gin.HandlerFunc {
 		// 处理请求
 		c.Next() //  处理请求
 	}
+}
+
+func upload(ctx *gin.Context) {
+	form, err := ctx.MultipartForm()
+	if err != nil {
+		ctx.String(500, err.Error())
+		return
+	}
+	files := form.File["file"]
+	for _, file := range files {
+		var path = file.Filename
+		err = ctx.SaveUploadedFile(file, "/tmp/"+path)
+		if err != nil {
+			ctx.String(500, err.Error())
+			return
+		}
+	}
+	ctx.String(200, "yes")
 }
