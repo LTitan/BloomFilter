@@ -8,6 +8,7 @@ type (
 	}
 	// ApplyRequest .
 	ApplyRequest struct {
-		Size uint64 `json:"size"`
+		Size       uint64 `json:"size"`
+		Expiration string `json:"expiration"`
 	}
 )

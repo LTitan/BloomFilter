@@ -2,44 +2,25 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"os"
 
-	"github.com/spf13/cobra"
+	"github.com/LTitan/BloomFilter/internal/proxy"
+	"github.com/spf13/pflag"
 )
 
-var rootCmd = &cobra.Command{
-	Use:   "proxy",
-	Short: "proxy bloomfilter",
-	Long:  "...",
-	Run: func(cmd *cobra.Command, args []string) {
-	},
-}
-
-var bloomFilter = &cobra.Command{
-	Use:   "bloomfilter",
-	Short: "start bloomfilter nodes",
-	Long:  "this is a test",
-	Args:  cobra.MinimumNArgs(2),
-	Run: func(cmd *cobra.Command, args []string) {
-		for _, str := range args {
-			fmt.Println(str)
-		}
-	},
-}
+var port int
 
 func init() {
-	rootCmd.AddCommand(bloomFilter)
+	pflag.IntVar(&port, "port", 7361, "port")
 }
+
 func main() {
-	// mp := make(map[string]struct{}, 0)
-	// for i := 0; i < 32; i++ {
-	// 	for j := 0; j <= 255; j++ {
-	// 		for k := 0; k <= 255; k++ {
-	// 			str := fmt.Sprintf("10.%d.%d.%d", i, j, k)
-	// 			mp[str] = struct{}{}
-	// 		}
-	// 	}
-	// }
-	fmt.Println("finish!")
-	time.Sleep(time.Minute * 3)
+	pflag.Parse()
+	p := os.Getenv("PROXY_PORT")
+	if p != "" {
+		p = ":" + p
+	} else {
+		p = fmt.Sprintf(":%d", port)
+	}
+	proxy.RunServer(p)
 }

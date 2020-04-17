@@ -1,6 +1,5 @@
 package dao
 
-
 import (
 	"crypto/md5"
 	"fmt"
@@ -11,13 +10,12 @@ import (
 )
 
 // CreateUser .
-func CreateUser(u *sqldata.UserInfo)(err error){
-	db := sql.OpenDB()
-	defer db.Close()
+func CreateUser(u *sqldata.UserInfo) (err error) {
+	db := sql.DefaultDB
 
 	u.Password = md5String(u.Password)
 	tx := db.Begin()
-	if err = tx.Model(&sqldata.UserInfo{}).Create(&u).Error;err!=nil{
+	if err = tx.Model(&sqldata.UserInfo{}).Create(&u).Error; err != nil {
 		tx.Rollback()
 		return
 	}
@@ -26,13 +24,13 @@ func CreateUser(u *sqldata.UserInfo)(err error){
 }
 
 // QueryHasUser .
-func QueryHasUser(u *sqldata.UserInfo)(ret bool,err error){
+func QueryHasUser(u *sqldata.UserInfo) (ret bool, err error) {
 	ret = false
-	db := sql.OpenDB()
+	db := sql.DefaultDB
 	u.Password = md5String(u.Password)
 	var temp sqldata.UserInfo
-	if err = db.Model(&sqldata.UserInfo{}).Where("name = ?",u.Name).First(&temp).Error;err!=nil{
-		if err == gorm.ErrRecordNotFound{
+	if err = db.Model(&sqldata.UserInfo{}).Where("name = ?", u.Name).First(&temp).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
 			return ret, nil
 		}
 		return
@@ -42,8 +40,8 @@ func QueryHasUser(u *sqldata.UserInfo)(ret bool,err error){
 }
 
 func md5String(str string) string {
-    data := []byte(str)
-    has := md5.Sum(data)
-    md5str := fmt.Sprintf("%x", has)
-    return md5str
+	data := []byte(str)
+	has := md5.Sum(data)
+	md5str := fmt.Sprintf("%x", has)
+	return md5str
 }

@@ -96,6 +96,18 @@ func (*Slave) QueryAll(ctx context.Context, rq *rpc.QueryManyRequest) (*rpc.Quer
 	return response, nil
 }
 
+// DoBackup .
+func (*Slave) DoBackup(ctx context.Context, recv *rpc.Reply) (*rpc.BackUpReply, error) {
+	response := new(rpc.BackUpReply)
+	if recv.GetRecv() {
+		loadFromFile()
+		for key := range cc.address {
+			response.Keys = append(response.Keys, key)
+		}
+	}
+	return response, nil
+}
+
 // DumpTricker .
 func DumpTricker() {
 	tm := time.NewTicker(time.Minute * 30)

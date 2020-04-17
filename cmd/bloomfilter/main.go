@@ -14,5 +14,5 @@ func main() {
 	}
 	serve := config.Conf.Get("bloomfilter.port").(int64)
 	go bloomfilter.RunClient(uint32(serve))
-	bloomfilter.RunServer(port)
+	bloomfilter.RunServer(port, uint32(serve))
 }

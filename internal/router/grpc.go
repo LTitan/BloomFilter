@@ -39,6 +39,11 @@ func (s *server) HeartBeat(ctx context.Context, req *rpc.MachineInfo) (*rpc.Repl
 	return &rpc.Reply{Recv: true}, nil
 }
 
+func (s *server) CancelRegister(ctx context.Context, req *rpc.MachineInfo) (*rpc.Reply, error) {
+	go register.DelHost(fmt.Sprintf("%v:%v", req.GetHost(), req.GetPort()))
+	return &rpc.Reply{Recv: true}, nil
+}
+
 // RunServer .
 func RunServer() {
 	lis, err := net.Listen("tcp", port)

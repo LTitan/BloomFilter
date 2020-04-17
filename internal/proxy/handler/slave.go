@@ -1,78 +1,38 @@
-package gateway
+package handler
 
 import (
 	"context"
-	"math/rand"
 	"net/http"
+	"sync"
 	"time"
 
-	"github.com/LTitan/BloomFilter/internal/router/register"
+	"github.com/LTitan/BloomFilter/internal/proxy/util"
 	"github.com/LTitan/BloomFilter/pkg/app"
-	"github.com/LTitan/BloomFilter/pkg/logs"
 	"github.com/LTitan/BloomFilter/pkg/response"
 	"github.com/LTitan/BloomFilter/pkg/rpc"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 )
 
-// ApplyMemory godoc
-// @Summary 新增文章标签
-// @Produce  json
-// @Param name query string true "Name"
-// @Param state query int false "State"
-// @Param created_by query int false "CreatedBy"
-// @Success 200 {string} json "{"code":200,"data":{},"msg":"ok"}"
-// @Router /api/v1/tags [post]
-func ApplyMemory(ctx *gin.Context) {
-	bf := response.APP{C: ctx}
-	var recv app.ApplyRequest
-	if err := ctx.BindJSON(&recv); err != nil {
-		bf.Response(http.StatusBadRequest, response.ParamsError, "params error", nil)
-		return
-	}
-	resp, err := applyHandler(recv.Size)
-	if err != nil {
-		bf.Response(http.StatusBadGateway, response.ServeError, err.Error(), nil)
-		return
-	}
-	bf.Response(http.StatusOK, response.OK, "ok", map[string]interface{}{"yes": resp.GetRecv(), "key": resp.GetKey()})
-	return
-}
-
-func applyHandler(size uint64) (recv *rpc.ApplyReply, err error) {
-	src := rand.NewSource(time.Now().UnixNano())
-	r := rand.New(src)
-	host := register.GetHosts()
-	logs.Logger.Infof("all register hosts: %v", host)
-	var address string
-	if len(host) == 1 {
-		address = host[0]
-	} else {
-		address = host[r.Intn(len(host))]
-	}
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
-	if err != nil {
-		return
-	}
-	client := rpc.NewSlaveServerClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()
-	recv, err = client.Apply(ctx, &rpc.ApplyRequest{Size: size})
-	if err != nil {
-		return
-	}
-	if recv.GetKey() != "" {
-		register.Register(recv.GetKey(), address)
-	}
-	return
+// Slave .
+type Slave struct {
+	Register *sync.Map
 }
 
 // QueryValue .
-func QueryValue(ctx *gin.Context) {
+// @Description query single value
+// @Produce json
+// @Tags Slave
+// @Param key query string true "apply key"
+// @Param value query string true "query value"
+// @Success 200 {bool} bool has or not
+// @Failure 400 {bool} bool has or not
+// @Router /bloomfilter/query [get]
+func (s *Slave) QueryValue(ctx *gin.Context) {
 	key := ctx.DefaultQuery("key", "-1")
 	value := ctx.DefaultQuery("value", "-1")
 	bf := response.APP{C: ctx}
-	address, found := register.GetRegistedHost(key)
+	address, found := s.getRegistedHost(key)
 	if !found {
 		bf.Response(http.StatusNotFound, response.ParamsError, "not found key", nil)
 		return
@@ -102,14 +62,21 @@ func querySingleHandler(key, value, address string) (res bool, err error) {
 }
 
 //AddValues .
-func AddValues(ctx *gin.Context) {
+// @Description query single value
+// @Produce json
+// @Tags Slave
+// @Param values body app.AddRequest true "add values"
+// @Success 200 {bool} bool has or not
+// @Failure 400 {bool} bool has or not
+// @Router /bloomfilter/add [post]
+func (s *Slave) AddValues(ctx *gin.Context) {
 	var recv app.AddRequest
 	bf := response.APP{C: ctx}
 	if err := ctx.BindJSON(&recv); err != nil {
 		bf.Response(http.StatusBadRequest, response.ParamsError, "params error", nil)
 		return
 	}
-	address, found := register.GetRegistedHost(recv.Key)
+	address, found := s.getRegistedHost(recv.Key)
 	if !found {
 		bf.Response(http.StatusNotFound, response.ParamsError, "not found key", nil)
 		return
@@ -139,14 +106,21 @@ func addHandler(recv *app.AddRequest, address string) (err error) {
 
 // QueryMany .
 // TODO:
-func QueryMany(ctx *gin.Context) {
+// @Description query single value
+// @Produce json
+// @Tags Slave
+// @Param values body app.AddRequest true "add values"
+// @Success 200 {bool} bool has or not
+// @Failure 400 {bool} bool has or not
+// @Router /bloomfilter/query [post]
+func (s *Slave) QueryMany(ctx *gin.Context) {
 	var recv app.AddRequest
 	bf := response.APP{C: ctx}
 	if err := ctx.BindJSON(&recv); err != nil {
 		bf.Response(http.StatusBadRequest, response.ParamsError, "params error", nil)
 		return
 	}
-	address, found := register.GetRegistedHost(recv.Key)
+	address, found := s.getRegistedHost(recv.Key)
 	if !found {
 		bf.Response(http.StatusNotFound, response.ParamsError, "not found key", nil)
 		return
@@ -170,4 +144,21 @@ func queryManyHandler(recv *app.AddRequest, address string) (res *rpc.QueryManyR
 	defer cancel()
 	res, err = client.QueryAll(ctx, &rpc.QueryManyRequest{Key: recv.Key, Values: recv.Strings})
 	return
+}
+
+func (s *Slave) getRegistedHost(key string) (interface{}, bool) {
+	return s.Register.Load(key)
+}
+
+// ReceiveRouter .
+func (s *Slave) ReceiveRouter() {
+	ret := util.GetHosts()
+	if ret == nil {
+		return
+	}
+	s.Register = nil
+	s.Register = new(sync.Map)
+	for key, value := range ret.(map[string]interface{}) {
+		s.Register.Store(key, value)
+	}
 }

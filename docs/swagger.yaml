@@ -11,6 +11,8 @@ definitions:
     type: object
   app.ApplyRequest:
     properties:
+      expiration:
+        type: string
       size:
         type: integer
     type: object
@@ -31,6 +33,30 @@ info:
   title: bloomfilter router
   version: "1.0"
 paths:
+  /bloomfilter/{address}:
+    put:
+      description: backup address
+      parameters:
+      - description: address(ip:port)
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            type: boolean
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - Slave
   /bloomfilter/add:
     post:
       description: query single value
@@ -77,6 +103,32 @@ paths:
           description: code":4000,"data":null,"message":""}
           schema:
             $ref: '#/definitions/handler.ApplyRes'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - Slave
+  /bloomfilter/del/{uuid}:
+    delete:
+      description: delete key
+      parameters:
+      - description: key(uuid)
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            type: boolean
+      security:
+      - ApiKeyAuth: []
       tags:
       - Slave
   /bloomfilter/query:
@@ -128,4 +180,9 @@ paths:
             type: bool
       tags:
       - Slave
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -2,6 +2,11 @@ package register
 
 import (
 	"sync"
+	"time"
+
+	"github.com/LTitan/BloomFilter/internal/router/dao"
+	"github.com/LTitan/BloomFilter/internal/router/sqldata"
+	"github.com/LTitan/BloomFilter/pkg/logs"
 )
 
 var globalMap *sync.Map
@@ -23,13 +28,26 @@ func GetHosts() []string {
 	})
 	return res
 }
+func DelHost(address string) {
+	globalMap.Delete(address)
+	err := dao.UpdateStatusApplyAddress(address, sqldata.StatusTemporarilyUnavailable)
+	if err != nil {
+		logs.Logger.Errorf("update apply records status fail, error:", err)
+	}
+}
 
-func Register(uuid string, address string) {
-	uuidMap.Store(uuid, address)
+func Register(uuid string, address string, size uint64, expira time.Time) {
+	var record sqldata.ApplyRecord
+	record.ErrorRate = 0
+	record.ForecastCap = size
+	record.ExpirationAt = expira
+	record.HostIP = address
+	record.UUID = uuid
+	record.Status = sqldata.StatusNormal
+	if err := dao.CreatedApplyRecord(&record); err != nil {
+		logs.Logger.Errorf("created apply records fail, error:", err)
+	}
 }
 func GetRegistedHost(uuid string) (interface{}, bool) {
-	return uuidMap.Load(uuid)
-}
-func DelRegisterHost(uuid string) {
-	uuidMap.Delete(uuid)
+	return dao.QueryApplyAddress(uuid)
 }

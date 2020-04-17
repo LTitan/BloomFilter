@@ -18,16 +18,14 @@ func init() {
 	user = config.Conf.Get("db.user")
 	passwd = config.Conf.Get("db.password")
 	dbName = config.Conf.Get("db.database")
-}
-
-// OpenDB .
-func OpenDB() (db *gorm.DB) {
 	var err error
-	db, err = gorm.Open("mysql", fmt.Sprintf("%v:%v@(%v:%v)/%v?charset=utf8&parseTime=True&loc=Local", user, passwd, host, port, dbName))
+	DefaultDB, err = gorm.Open("mysql", fmt.Sprintf("%v:%v@(%v:%v)/%v?charset=utf8&parseTime=True&loc=Local", user, passwd, host, port, dbName))
 	if err != nil {
 		panic(err)
 	}
-	db.DB().SetMaxIdleConns(5)
-	db.DB().SetMaxOpenConns(10)
-	return
+	DefaultDB.DB().SetMaxIdleConns(5)
+	DefaultDB.DB().SetMaxOpenConns(10)
 }
+
+// DefaultDB gloabl db
+var DefaultDB *gorm.DB
