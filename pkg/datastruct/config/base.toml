@@ -1,0 +1,22 @@
+title = "bloom filter config"
+
+[db]
+host = "127.0.0.1"
+port = 3306
+user = "lyf"
+password = "lyf110110"
+database = "bloomfilter"
+
+
+[dump]
+path = "./dump_record"
+
+[router]
+host = "192.168.1.106"
+server_port = "65221"
+grpc_port = "50051"
+
+
+[bloomfilter]
+port = 65220
+network = "eth2"

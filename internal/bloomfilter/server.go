@@ -12,6 +12,7 @@ import (
 	"github.com/LTitan/BloomFilter/pkg/rpc"
 	"github.com/LTitan/BloomFilter/pkg/signal"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -28,12 +29,20 @@ func RunServer(port string, _port uint32) {
 		logs.Logger.Warnf("process will exit ...., cancel register send error: %v", err)
 		defer logs.Logger.Sync()
 	})
+	// use self tls authorization
+	c, err := credentials.NewServerTLSFromFile("./config/server.pem", "./config/server.key")
+	if err != nil {
+		logs.Logger.Fatalf("failed to read tls psm and key error %v", port, err)
+		panic("failed to read tls config:" + err.Error())
+	}
+	// listen port
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		logs.Logger.Fatalf("failed to listen(%v), error %v", port, err)
 		panic("failed to listen:" + err.Error())
 	}
-	s := grpc.NewServer()
+	// new srever
+	s := grpc.NewServer(grpc.Creds(c))
 	rpc.RegisterSlaveServerServer(s, &self.Slave{})
 	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {

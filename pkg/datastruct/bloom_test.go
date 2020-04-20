@@ -7,7 +7,7 @@ import (
 
 func TestNew(t *testing.T) {
 	bf := New(1024)
-	// bf := make(map[string]string)
+	//bf := make(map[string]bool)
 	for i := 0; i < 10000000; i++ {
 		s := fmt.Sprintf("%d.%d.%d.%d", i, i/10, i/100, i/1000)
 		bf.Add(s)
@@ -19,7 +19,7 @@ func TestNew(t *testing.T) {
 			cnt++
 		}
 	}
-	t.Errorf("%.4f", 10000000.0/float64(cnt))
+	t.Logf("accuracy: %.4f", 10000000.0/float64(cnt))
 }
 func Benchnew(b *testing.B) {
 	for i := 0; i < b.N; i++ {

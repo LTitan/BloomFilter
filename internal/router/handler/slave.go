@@ -18,10 +18,21 @@ import (
 	"github.com/LTitan/BloomFilter/pkg/rpc"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 // Slave .
 type Slave struct{}
+
+var clientTLSKey credentials.TransportCredentials
+
+func init() {
+	var err error
+	clientTLSKey, err = credentials.NewClientTLSFromFile("./config/server.pem", "bloomfilter")
+	if err != nil {
+		panic(err)
+	}
+}
 
 // ApplyMemory .
 // @Security ApiKeyAuth
@@ -68,11 +79,11 @@ func applyHandler(size uint64, expira time.Time) (recv *rpc.ApplyReply, err erro
 	} else {
 		address = host[r.Intn(len(host))]
 	}
-
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(clientTLSKey))
 	if err != nil {
 		return
 	}
+	defer conn.Close()
 	client := rpc.NewSlaveServerClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
@@ -122,7 +133,7 @@ func (*Slave) QueryValue(ctx *gin.Context) {
 }
 
 func querySingleHandler(key, value, address string) (res bool, err error) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(clientTLSKey))
 	if err != nil {
 		return
 	}
@@ -165,7 +176,7 @@ func (*Slave) AddValues(ctx *gin.Context) {
 }
 
 func addHandler(recv *app.AddRequest, address string) (err error) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(clientTLSKey))
 	if err != nil {
 		return
 	}
@@ -210,7 +221,7 @@ func (*Slave) QueryMany(ctx *gin.Context) {
 }
 
 func queryManyHandler(recv *app.AddRequest, address string) (res *rpc.QueryManyReply, err error) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(clientTLSKey))
 	if err != nil {
 		return
 	}
@@ -247,7 +258,7 @@ func (*Slave) DeletKey(ctx *gin.Context) {
 }
 
 func deleteHandler(address, uuid string) (err error) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(clientTLSKey))
 	if err != nil {
 		return
 	}
@@ -290,7 +301,7 @@ func (*Slave) BackupSlave(ctx *gin.Context) {
 }
 
 func backupHandler(address string) ([]string, error) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(clientTLSKey))
 	if err != nil {
 		return nil, err
 	}

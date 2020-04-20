@@ -12,11 +12,22 @@ import (
 	"github.com/LTitan/BloomFilter/pkg/rpc"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 // Slave .
 type Slave struct {
 	Register *sync.Map
+}
+
+var clientTLSKey credentials.TransportCredentials
+
+func init() {
+	var err error
+	clientTLSKey, err = credentials.NewClientTLSFromFile("/opt/server.pem", "bloomfilter")
+	if err != nil {
+		panic(err)
+	}
 }
 
 // QueryValue .
@@ -47,7 +58,7 @@ func (s *Slave) QueryValue(ctx *gin.Context) {
 }
 
 func querySingleHandler(key, value, address string) (res bool, err error) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(clientTLSKey))
 	if err != nil {
 		return
 	}
@@ -90,7 +101,7 @@ func (s *Slave) AddValues(ctx *gin.Context) {
 }
 
 func addHandler(recv *app.AddRequest, address string) (err error) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(clientTLSKey))
 	if err != nil {
 		return
 	}
@@ -135,7 +146,7 @@ func (s *Slave) QueryMany(ctx *gin.Context) {
 }
 
 func queryManyHandler(recv *app.AddRequest, address string) (res *rpc.QueryManyReply, err error) {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(clientTLSKey))
 	if err != nil {
 		return
 	}
