@@ -51,12 +51,16 @@ message QueryManyReply{
 message BackUpReply{
     repeated  string keys = 1;
 }
-
+// router rpc interface
+// heartbeat to accept slave
+// delete register hosts infomation
 service Greeter{
     rpc HeartBeat(MachineInfo) returns(Reply){}
     rpc CancelRegister(MachineInfo) returns(Reply){}
 }
-
+// single bloomfilter rpc interface
+// defined input and output message
+// apply、CRD 、backup restore/dump files
 service SlaveServer{
     rpc Apply(ApplyRequest) returns(ApplyReply){}
     rpc Add(AddRequest) returns(Reply){}

@@ -62,6 +62,7 @@ func querySingleHandler(key, value, address string) (res bool, err error) {
 	if err != nil {
 		return
 	}
+	defer conn.Close()
 	client := rpc.NewSlaveServerClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
@@ -105,6 +106,7 @@ func addHandler(recv *app.AddRequest, address string) (err error) {
 	if err != nil {
 		return
 	}
+	defer conn.Close()
 	client := rpc.NewSlaveServerClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
@@ -150,6 +152,7 @@ func queryManyHandler(recv *app.AddRequest, address string) (res *rpc.QueryManyR
 	if err != nil {
 		return
 	}
+	defer conn.Close()
 	client := rpc.NewSlaveServerClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
