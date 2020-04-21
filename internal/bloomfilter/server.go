@@ -26,6 +26,7 @@ func RunServer(port string, _port uint32) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 		_, err := c.CancelRegister(ctx, &rpc.MachineInfo{Host: ip, Port: _port})
 		defer cancel()
+		defer conn.Close()
 		logs.Logger.Warnf("process will exit ...., cancel register send error: %v", err)
 		defer logs.Logger.Sync()
 	})

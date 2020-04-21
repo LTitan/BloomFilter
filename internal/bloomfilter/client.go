@@ -64,6 +64,7 @@ func RunClient(server uint32) {
 			cancel()
 			cnt = 0
 			sumCPUUsage = 0
+			conn.Close()
 		case <-cpuTicker.C:
 			currCPU, _ := cpu.Get()
 			sumCPUUsage += (float32(currCPU.System-preCPU.System) / float32(currCPU.Total-preCPU.Total) * 100)
